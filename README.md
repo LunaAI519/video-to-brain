@@ -1,5 +1,11 @@
 # 📹 video-to-brain
 
+[![Tests](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml/badge.svg)](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![GitHub release](https://img.shields.io/github/v/release/LunaAI519/video-to-brain)](https://github.com/LunaAI519/video-to-brain/releases)
+[![Twitter Follow](https://img.shields.io/twitter/follow/LunaAI519?style=social)](https://twitter.com/LunaAI519)
+
 **手机发视频，AI 帮你做笔记。**
 
 不是转文字。是真的帮你做笔记——提炼要点、摘金句、列行动项、自动分类存入 Obsidian。
@@ -13,6 +19,8 @@
 │ 视频     │    │ (最大2GB)    │    │(Whisper) │    │(LLM分析)  │    │ 自动分类  │
 └──────────┘    └──────────────┘    └─────────┘    └──────────┘    └──────────┘
 ```
+
+**📸 看看生成的笔记长什么样：** [学习笔记示例](docs/demo/sample-note-study.md) · [内容素材示例](docs/demo/sample-note-content.md)
 
 ---
 
