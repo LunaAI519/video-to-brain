@@ -1,72 +1,105 @@
 """
-基础用法示例 / Basic Usage Example
+video-to-brain 基础用法示例
 
-展示如何用 video-to-brain 将视频转成 Obsidian 笔记。
-Shows how to use video-to-brain to turn videos into Obsidian notes.
+展示三种使用方式：
+1. 基础模式 — 只转文字，不需要 AI
+2. AI 模式 — 自动生成智能笔记
+3. 指定模板 — 不同视频用不同模板
 """
 
-import sys
-sys.path.insert(0, "..")
+from src import video_to_text, generate_note
+from src.ai_processor import analyze_transcript
 
-from src import video_to_text, generate_note, check_dependencies
+# ============================================
+# 例 1: 基础模式（只转文字，不需要 API）
+# ============================================
 
+text = video_to_text("path/to/video.mp4")
 
-def main():
-    # 1. 检查依赖
-    deps = check_dependencies()
-    print(f"ffmpeg: {'✅' if deps['ffmpeg'] else '❌'} {deps['ffmpeg'] or 'Not installed'}")
-    print(f"whisper: {'✅' if deps['whisper'] else '❌'} {deps['whisper'] or 'Not installed'}")
-    
-    if not all(deps.values()):
-        print("\n请先安装缺失的依赖 / Please install missing dependencies first.")
-        return
-    
-    # 2. 视频转文字（替换成你的视频路径）
-    video_path = "path/to/your/video.mp4"
-    print(f"\n正在处理视频: {video_path}")
-    
-    text = video_to_text(
-        video_path,
-        language=None,      # None = 自动检测语言
-        model="turbo",      # turbo 最快，质量也够用
-    )
-    print(f"转录完成！{len(text)} 字符")
-    print(f"预览: {text[:200]}...")
-    
-    # 3. 生成 Obsidian 笔记
-    note_path = generate_note(
-        transcript=text,
-        title="我的视频笔记",
-        source="Telegram",
-        tags=["视频笔记", "AI"],
-        output_dir="./output/",     # 替换成你的 Obsidian vault 路径
-    )
-    print(f"\n笔记已保存: {note_path}")
+note_path = generate_note(
+    transcript=text,
+    title="这个视频讲了什么",
+    tags=["学习", "AI"],
+    output_dir="~/Documents/my-vault/01-收件箱/",
+)
+print(f"笔记已保存: {note_path}")
 
 
-if __name__ == "__main__":
-    main()
-"""
+# ============================================
+# 例 2: AI 智能模式（需要配置 LLM_API_KEY）
+# ============================================
 
-# 异步用法（下载大视频） / Async usage (download large videos)
+# 带时间戳的转录
+text, timestamps, duration = video_to_text(
+    "path/to/video.mp4",
+    with_timestamps=True,
+)
+
+# AI 分析（自动检测内容类型）
+analysis = analyze_transcript(text, template="auto")
+
+# 生成智能笔记
+note_path = generate_note(
+    transcript=text,
+    source="YouTube - 某某频道",
+    output_dir="~/Documents/my-vault/",
+    ai_analysis=analysis,        # AI 分析结果
+    timestamps=timestamps,        # 时间戳
+    duration_seconds=duration,    # 视频时长
+)
+print(f"AI 笔记已保存: {note_path}")
+print(f"摘要: {analysis.get('summary', '无')}")
+print(f"核心要点: {analysis.get('key_points', [])}")
+
+
+# ============================================
+# 例 3: 指定模板
+# ============================================
+
+# 学习视频 → 知识点 + 延伸思考
+study_analysis = analyze_transcript(text, template="study")
+
+# 会议录音 → 纪要 + 待办
+meeting_analysis = analyze_transcript(text, template="meeting")
+
+# 播客资讯 → 论点 + 数据
+news_analysis = analyze_transcript(text, template="news")
+
+# 内容素材 → 爆款观点 + 推文草稿
+content_analysis = analyze_transcript(text, template="content")
+
+# 生成笔记时传入对应的 analysis
+note_path = generate_note(
+    transcript=text,
+    output_dir="~/Documents/my-vault/",
+    ai_analysis=study_analysis,
+    template="study",
+)
+
+
+# ============================================
+# 例 4: 下载大视频（突破 20MB 限制）
+# ============================================
 
 import asyncio
 from src import download_large_video, is_available
 
-async def download_example():
-    if not is_available():
-        print("Pyrogram not configured. Set TELEGRAM_API_ID and TELEGRAM_API_HASH.")
-        return
-    
-    path = await download_large_video(
-        chat_id=-1001234567890,     # 你的 chat ID
-        message_id=123,             # 视频消息 ID
-        output_dir="./downloads/",
-    )
-    
-    if path:
-        print(f"下载完成: {path}")
-        # 然后可以用 video_to_text(path) 转录
+async def download_and_process():
+    if is_available():
+        path = await download_large_video(
+            chat_id=-1001234567890,
+            message_id=123,
+            output_dir="./downloads/",
+        )
+        if path:
+            text, timestamps, duration = video_to_text(path, with_timestamps=True)
+            analysis = analyze_transcript(text)
+            generate_note(
+                transcript=text,
+                output_dir="~/Documents/my-vault/",
+                ai_analysis=analysis,
+                timestamps=timestamps,
+                duration_seconds=duration,
+            )
 
-# asyncio.run(download_example())
-"""
+asyncio.run(download_and_process())
