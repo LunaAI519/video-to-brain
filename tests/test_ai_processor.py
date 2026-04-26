@@ -1,6 +1,5 @@
 """Tests for ai_processor module."""
 
-import pytest
 from src.ai_processor import TEMPLATES, get_template_names
 
 

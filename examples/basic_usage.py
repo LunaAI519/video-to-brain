@@ -7,7 +7,7 @@ video-to-brain 基础用法示例
 3. 指定模板 — 不同视频用不同模板
 """
 
-from src import video_to_text, generate_note
+from src import generate_note, video_to_text
 from src.ai_processor import analyze_transcript
 
 # ============================================
@@ -43,9 +43,9 @@ note_path = generate_note(
     transcript=text,
     source="YouTube - 某某频道",
     output_dir="~/Documents/my-vault/",
-    ai_analysis=analysis,        # AI 分析结果
-    timestamps=timestamps,        # 时间戳
-    duration_seconds=duration,    # 视频时长
+    ai_analysis=analysis,  # AI 分析结果
+    timestamps=timestamps,  # 时间戳
+    duration_seconds=duration,  # 视频时长
 )
 print(f"AI 笔记已保存: {note_path}")
 print(f"摘要: {analysis.get('summary', '无')}")
@@ -82,7 +82,9 @@ note_path = generate_note(
 # ============================================
 
 import asyncio
+
 from src import download_large_video, is_available
+
 
 async def download_and_process():
     if is_available():
@@ -101,5 +103,6 @@ async def download_and_process():
                 timestamps=timestamps,
                 duration_seconds=duration,
             )
+
 
 asyncio.run(download_and_process())

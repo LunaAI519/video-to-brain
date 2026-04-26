@@ -25,9 +25,7 @@ def check_dependencies() -> dict:
     result = {}
     for cmd in ["ffmpeg", "whisper"]:
         try:
-            out = subprocess.run(
-                ["which", cmd], capture_output=True, text=True, timeout=5
-            )
+            out = subprocess.run(["which", cmd], capture_output=True, text=True, timeout=5)
             result[cmd] = out.stdout.strip() if out.returncode == 0 else None
         except Exception:
             result[cmd] = None
@@ -42,8 +40,11 @@ def get_video_duration(video_path: str) -> int:
     """
     try:
         cmd = [
-            "ffprobe", "-v", "quiet",
-            "-print_format", "json",
+            "ffprobe",
+            "-v",
+            "quiet",
+            "-print_format",
+            "json",
             "-show_format",
             video_path,
         ]
@@ -73,12 +74,16 @@ def extract_audio(video_path: str, output_path: str = None) -> str:
         output_path = os.path.join(tempfile.gettempdir(), "vtb_audio.wav")
 
     cmd = [
-        "ffmpeg", "-i", video_path,
-        "-vn",                    # No video
-        "-acodec", "pcm_s16le",   # WAV format
-        "-ar", "16000",           # 16kHz sample rate (optimal for Whisper)
+        "ffmpeg",
+        "-i",
+        video_path,
+        "-vn",  # No video
+        "-acodec",
+        "pcm_s16le",  # WAV format
+        "-ar",
+        "16000",  # 16kHz sample rate (optimal for Whisper)
         output_path,
-        "-y",                     # Overwrite
+        "-y",  # Overwrite
     ]
 
     logger.info("Extracting audio: %s → %s", video_path, output_path)
@@ -122,10 +127,14 @@ def transcribe(
     os.makedirs(output_dir, exist_ok=True)
 
     cmd = [
-        "whisper", audio_path,
-        "--model", model,
-        "--output_format", "txt",
-        "--output_dir", output_dir,
+        "whisper",
+        audio_path,
+        "--model",
+        model,
+        "--output_format",
+        "txt",
+        "--output_dir",
+        output_dir,
     ]
 
     if language:
@@ -182,10 +191,14 @@ def transcribe_with_timestamps(
 
     # Use SRT format to get timestamps
     cmd = [
-        "whisper", audio_path,
-        "--model", model,
-        "--output_format", "srt",
-        "--output_dir", output_dir,
+        "whisper",
+        audio_path,
+        "--model",
+        model,
+        "--output_format",
+        "srt",
+        "--output_dir",
+        output_dir,
     ]
 
     if language:
@@ -221,10 +234,12 @@ def transcribe_with_timestamps(
 
     for seg in segments:
         if seg["start_seconds"] - last_marker >= interval_seconds:
-            timestamps.append({
-                "time": _format_time(seg["start_seconds"]),
-                "text": seg["text"][:80] + ("..." if len(seg["text"]) > 80 else ""),
-            })
+            timestamps.append(
+                {
+                    "time": _format_time(seg["start_seconds"]),
+                    "text": seg["text"][:80] + ("..." if len(seg["text"]) > 80 else ""),
+                }
+            )
             last_marker = seg["start_seconds"]
 
     logger.info("Transcription complete: %d chars, %d timestamp markers", len(full_text), len(timestamps))
@@ -311,7 +326,9 @@ def video_to_text(
     try:
         if with_timestamps:
             text, timestamps = transcribe_with_timestamps(
-                audio_path, language=language, model=model,
+                audio_path,
+                language=language,
+                model=model,
                 initial_prompt=initial_prompt,
                 interval_seconds=timestamp_interval,
             )

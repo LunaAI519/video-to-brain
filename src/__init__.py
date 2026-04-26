@@ -7,11 +7,11 @@ Built by a non-coder using vibe coding.
 
 __version__ = "0.3.0"
 
-from .transcriber import video_to_text, check_dependencies, get_video_duration, transcribe_with_timestamps
-from .note_generator import generate_note, get_obsidian_path
-from .large_download import download_large_video, is_available, shutdown
 from .ai_processor import analyze_transcript, get_template_names
 from .env_loader import load_env
+from .large_download import download_large_video, is_available, shutdown
+from .note_generator import generate_note, get_obsidian_path
+from .transcriber import check_dependencies, get_video_duration, transcribe_with_timestamps, video_to_text
 
 __all__ = [
     "video_to_text",

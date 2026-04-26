@@ -21,3 +21,12 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Type checking / Linting
+.mypy_cache/
+.ruff_cache/
+
+# Coverage
+coverage.xml
+htmlcov/
+.coverage

@@ -1,7 +1,8 @@
 """Tests for transcriber module."""
 
 import pytest
-from src.transcriber import _parse_srt, _format_time
+
+from src.transcriber import _format_time, _parse_srt
 
 
 class TestParseSrt:

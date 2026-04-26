@@ -11,7 +11,6 @@ import json
 import logging
 import os
 import re
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -32,19 +31,25 @@ def _call_llm(system_prompt: str, user_prompt: str, temperature: float = 0.3) ->
         import urllib.request
 
         url = f"{LLM_BASE_URL.rstrip('/')}/chat/completions"
-        payload = json.dumps({
-            "model": LLM_MODEL,
-            "messages": [
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            "temperature": temperature,
-        }).encode("utf-8")
+        payload = json.dumps(
+            {
+                "model": LLM_MODEL,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                "temperature": temperature,
+            }
+        ).encode("utf-8")
 
-        req = urllib.request.Request(url, data=payload, headers={
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {LLM_API_KEY}",
-        })
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {LLM_API_KEY}",
+            },
+        )
 
         with urllib.request.urlopen(req, timeout=120) as resp:
             data = json.loads(resp.read().decode("utf-8"))
@@ -145,7 +150,8 @@ TEMPLATES = {
         "name": "🤖 自动识别",
         "name_en": "Auto Detect",
         "icon": "🤖",
-        "prompt": """你是一个智能笔记助手。请先判断这段转录文字的类型（学习/会议/资讯/内容素材），然后生成对应的结构化笔记。
+        "prompt": """你是一个智能笔记助手。请先判断这段转录文字的类型（学习/会议/资讯/内容素材），\
+然后生成对应的结构化笔记。
 
 要求输出以下 JSON 格式（中文）：
 {

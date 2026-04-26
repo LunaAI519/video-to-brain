@@ -32,6 +32,7 @@ def _load_credentials(env_path: str = None) -> tuple[int, str, str] | None:
     """Read TELEGRAM_API_ID, TELEGRAM_API_HASH, TELEGRAM_BOT_TOKEN from env / .env."""
     # Ensure env vars are loaded (idempotent)
     from src.env_loader import load_env
+
     load_env(env_path or ".env")
 
     api_id = os.environ.get("TELEGRAM_API_ID")

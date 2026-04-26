@@ -10,29 +10,32 @@ video-to-brain Telegram Bot — 一键运行
     在 .env 文件中设置必要的环境变量（见 .env.example）
 """
 
-import asyncio
 import logging
 import os
 import sys
 import time
 from collections import defaultdict
-from pathlib import Path
 
 # Load .env file (before any other imports that read env vars)
 from src.env_loader import load_env
+
 load_env()
 
 # Now import after env is loaded
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import (
-    Application, CommandHandler, MessageHandler, CallbackQueryHandler,
-    filters, ContextTypes,
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
 )
 
-from src.transcriber import video_to_text, check_dependencies, get_video_duration
-from src.note_generator import generate_note
-from src.ai_processor import analyze_transcript, get_template_names, LLM_API_KEY
+from src.ai_processor import LLM_API_KEY, analyze_transcript, get_template_names
 from src.large_download import is_available as large_dl_available
+from src.note_generator import generate_note
+from src.transcriber import check_dependencies, video_to_text
 
 logging.basicConfig(
     format="%(asctime)s [%(name)s] %(levelname)s: %(message)s",
@@ -115,10 +118,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 📁 笔记保存到: {OBSIDIAN_VAULT}
 
 系统状态:
-  ffmpeg: {'✅' if deps['ffmpeg'] else '❌ 未安装'}
-  whisper: {'✅' if deps['whisper'] else '❌ 未安装'}
-  大视频支持(>20MB): {'✅ 最大2GB' if large_dl else '❌ 仅支持20MB以下'}
-  AI智能笔记: {'✅ 已配置' if ai_ready else '⚠️ 未配置（仅基础转录）'}
+  ffmpeg: {"✅" if deps["ffmpeg"] else "❌ 未安装"}
+  whisper: {"✅" if deps["whisper"] else "❌ 未安装"}
+  大视频支持(>20MB): {"✅ 最大2GB" if large_dl else "❌ 仅支持20MB以下"}
+  AI智能笔记: {"✅ 已配置" if ai_ready else "⚠️ 未配置（仅基础转录）"}
 
 发送 /help 查看所有命令。"""
 
@@ -213,8 +216,8 @@ async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 📋 笔记模板: {current_template}
 📁 保存路径: {OBSIDIAN_VAULT}
-🤖 AI分析: {'✅ 开启' if ai_ready else '❌ 关闭'}
-📹 大视频: {'✅ 支持' if large_dl_available() else '❌ 不支持'}
+🤖 AI分析: {"✅ 开启" if ai_ready else "❌ 关闭"}
+📹 大视频: {"✅ 支持" if large_dl_available() else "❌ 不支持"}
 🔒 访问控制: {acl_status}
 ⏱️ 频率限制: {RATE_LIMIT} 次/分钟"""
 
@@ -230,6 +233,23 @@ async def set_vault(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.args:
         new_path = " ".join(context.args)
         new_path = os.path.expanduser(new_path)
+        new_path = os.path.realpath(new_path)
+        # Security: block path traversal and sensitive system paths
+        blocked_prefixes = (
+            "/etc",
+            "/var",
+            "/usr",
+            "/bin",
+            "/sbin",
+            "/proc",
+            "/sys",
+            "/dev",
+            "/private/etc",
+            "/private/var",
+        )
+        if any(new_path.startswith(p) for p in blocked_prefixes):
+            await update.message.reply_text("⛔ 不允许设置系统目录为保存路径。")
+            return
         OBSIDIAN_VAULT = new_path
         await update.message.reply_text(f"📁 笔记保存路径已更改为:\n{OBSIDIAN_VAULT}")
     else:
@@ -283,11 +303,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Status update
     templates = get_template_names()
     template_name = templates.get(template, "自动")
-    status_msg = await msg.reply_text(
-        f"📹 收到视频 ({size_mb:.1f} MB)\n"
-        f"📋 模板: {template_name}\n"
-        f"⏳ 正在处理..."
-    )
+    status_msg = await msg.reply_text(f"📹 收到视频 ({size_mb:.1f} MB)\n📋 模板: {template_name}\n⏳ 正在处理...")
 
     try:
         # Step 1: Download video
@@ -300,11 +316,10 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
                 return
 
-            await status_msg.edit_text(
-                f"📹 视频 {size_mb:.1f} MB\n⬇️ 正在通过 MTProto 下载大视频..."
-            )
+            await status_msg.edit_text(f"📹 视频 {size_mb:.1f} MB\n⬇️ 正在通过 MTProto 下载大视频...")
 
             from src.large_download import download_large_video
+
             cache_dir = os.path.expanduser("~/.video-to-brain/cache/videos")
             video_path = await download_large_video(
                 chat_id=msg.chat_id,
@@ -316,9 +331,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await status_msg.edit_text("❌ 视频下载失败，请重试。")
                 return
         else:
-            await status_msg.edit_text(
-                f"📹 视频 {size_mb:.1f} MB\n⬇️ 正在下载..."
-            )
+            await status_msg.edit_text(f"📹 视频 {size_mb:.1f} MB\n⬇️ 正在下载...")
 
             file_obj = await video.get_file()
             cache_dir = os.path.expanduser("~/.video-to-brain/cache/videos")
@@ -377,7 +390,7 @@ async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
 {summary}{key_points}
 📝 笔记: {os.path.basename(note_path)}
 📁 位置: {os.path.dirname(note_path)}
-📊 转录: {len(text)} 字 · {'AI分析 ✅' if ai_analysis else '基础模式'}
+📊 转录: {len(text)} 字 · {"AI分析 ✅" if ai_analysis else "基础模式"}
 ⏱️ 时间标记: {len(timestamps)} 个"""
 
         if len(result_text) > 4000:

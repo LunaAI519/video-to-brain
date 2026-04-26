@@ -2,8 +2,8 @@
 
 import os
 import tempfile
-import pytest
-from src.note_generator import generate_note, get_obsidian_path, OBSIDIAN_FOLDERS
+
+from src.note_generator import OBSIDIAN_FOLDERS, generate_note, get_obsidian_path
 
 
 class TestGenerateNote:
