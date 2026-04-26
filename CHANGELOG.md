@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-04-26
+
+### 🔒 Security & Access Control
+- `ALLOWED_USERS` whitelist — restrict who can use the bot
+- Rate limiting (`RATE_LIMIT`) — prevent abuse (default 5 req/min)
+- Access control shown in `/status` command
+
+### 🐳 Docker
+- `Dockerfile` for one-command deployment (ffmpeg + Whisper pre-installed)
+- `docker-compose.yml` with volume mounts for vault and cache
+- `.dockerignore` for clean builds
+
+### 🧪 Testing & CI
+- Bot command tests with mocking (access control, rate limiting, prefs)
+- `env_loader` module tests
+- Coverage reporting with `pytest-cov`
+- Codecov integration in CI
+- Dependabot for pip and GitHub Actions auto-updates
+
+### 🔧 Code Quality
+- Extracted shared `src/env_loader.py` (removed duplicate `.env` parsing)
+- Simplified `large_download.py` credentials loading
+- Enhanced `/help` command with full command reference
+
+### 📖 Documentation
+- README: Docker deployment section
+- README: Security features section
+- README: Star History chart
+- README: Codecov and Docker badges
+- README: GIF demo placeholder
+- Updated `.env.example` with `ALLOWED_USERS` and `RATE_LIMIT`
+- Updated project structure in README
+
+### 🚀 CI/CD
+- Auto-release workflow (tag push → GitHub Release with changelog)
+
 ## [0.2.0] - 2026-04-26
 
 ### 🤖 AI Smart Notes

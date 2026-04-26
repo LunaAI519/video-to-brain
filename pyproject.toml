@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "video-to-brain"
-version = "0.2.0"
+version = "0.3.0"
 description = "Send videos via Telegram → AI transcribes → Smart notes in Obsidian. Break 20MB limit."
 readme = "README.md"
 license = {text = "MIT"}

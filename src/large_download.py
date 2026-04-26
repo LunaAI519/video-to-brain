@@ -30,29 +30,13 @@ _client_lock = asyncio.Lock()
 
 def _load_credentials(env_path: str = None) -> tuple[int, str, str] | None:
     """Read TELEGRAM_API_ID, TELEGRAM_API_HASH, TELEGRAM_BOT_TOKEN from env / .env."""
+    # Ensure env vars are loaded (idempotent)
+    from src.env_loader import load_env
+    load_env(env_path or ".env")
+
     api_id = os.environ.get("TELEGRAM_API_ID")
     api_hash = os.environ.get("TELEGRAM_API_HASH")
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")
-
-    if not all([api_id, api_hash, bot_token]):
-        # Try loading from .env file
-        if env_path is None:
-            env_path = os.path.expanduser("~/.hermes/.env")
-        if os.path.exists(env_path):
-            with open(env_path) as f:
-                for line in f:
-                    line = line.strip()
-                    if line.startswith("#") or "=" not in line:
-                        continue
-                    key, _, val = line.partition("=")
-                    key = key.strip()
-                    val = val.strip().strip("'\"")
-                    if key == "TELEGRAM_API_ID" and not api_id:
-                        api_id = val
-                    elif key == "TELEGRAM_API_HASH" and not api_hash:
-                        api_hash = val
-                    elif key == "TELEGRAM_BOT_TOKEN" and not bot_token:
-                        bot_token = val
 
     if not all([api_id, api_hash, bot_token]):
         return None

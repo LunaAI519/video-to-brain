@@ -1,9 +1,11 @@
 # 📹 video-to-brain
 
 [![Tests](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml/badge.svg)](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/LunaAI519/video-to-brain/branch/main/graph/badge.svg)](https://codecov.io/gh/LunaAI519/video-to-brain)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![GitHub release](https://img.shields.io/github/v/release/LunaAI519/video-to-brain)](https://github.com/LunaAI519/video-to-brain/releases)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://github.com/LunaAI519/video-to-brain#-docker-一键部署推荐)
 [![Twitter Follow](https://img.shields.io/twitter/follow/LunaAI519?style=social)](https://twitter.com/LunaAI519)
 
 **手机发视频，AI 帮你做笔记。**
@@ -19,6 +21,13 @@
 │ 视频     │    │ (最大2GB)    │    │(Whisper) │    │(LLM分析)  │    │ 自动分类  │
 └──────────┘    └──────────────┘    └─────────┘    └──────────┘    └──────────┘
 ```
+
+<!-- 🎬 GIF Demo — replace with your own screen recording -->
+<p align="center">
+  <img src="docs/demo/demo.gif" alt="video-to-brain demo" width="600">
+  <br>
+  <em>手机发视频 → 30秒后收到 AI 笔记 → 自动存入 Obsidian</em>
+</p>
 
 **📸 看看生成的笔记长什么样：** [学习笔记示例](docs/demo/sample-note-study.md) · [内容素材示例](docs/demo/sample-note-content.md)
 
@@ -247,21 +256,62 @@ note_path = generate_note(
 
 ---
 
+## 🐳 Docker 一键部署（推荐）
+
+不想折腾 ffmpeg、Whisper 安装？用 Docker：
+
+```bash
+# 1. 克隆 + 配置
+git clone https://github.com/LunaAI519/video-to-brain.git
+cd video-to-brain
+cp .env.example .env
+# 编辑 .env，填入你的 token
+
+# 2. 一键启动
+docker compose up -d
+
+# 查看日志
+docker compose logs -f
+```
+
+就这么简单。ffmpeg、Whisper 全部自动装好。
+
+---
+
+## 🔒 安全特性
+
+- **访问控制** — `ALLOWED_USERS` 白名单，只有指定的人能用
+- **频率限制** — `RATE_LIMIT` 防止滥用（默认 5 次/分钟）
+- **密钥隔离** — 所有敏感信息走 `.env`，不进代码
+- **安全策略** — [SECURITY.md](SECURITY.md) 定义了漏洞报告流程
+
+```env
+# .env 中配置白名单（强烈建议）
+ALLOWED_USERS=123456789,987654321
+RATE_LIMIT=5
+```
+
+---
+
 ## 📁 项目结构
 
 ```
 video-to-brain/
 ├── src/
 │   ├── __init__.py           # 包入口
+│   ├── env_loader.py         # 环境变量加载（共享）
 │   ├── large_download.py     # Pyrogram 大视频下载（突破20MB）
 │   ├── transcriber.py        # ffmpeg + Whisper 转录 + 时间戳
 │   ├── note_generator.py     # Obsidian 笔记生成（支持AI模板）
 │   └── ai_processor.py       # LLM 智能分析（4种模板）
+├── tests/                    # 测试套件
 ├── examples/
 │   └── basic_usage.py        # 用法示例
 ├── docs/
 │   └── telegram-setup.md     # Telegram 配置教程
 ├── bot.py                    # Telegram Bot 一键启动
+├── Dockerfile                # Docker 镜像
+├── docker-compose.yml        # Docker Compose 配置
 ├── .env.example              # 环境变量模板
 ├── requirements.txt          # Python 依赖
 ├── LICENSE                   # MIT 协议
@@ -358,3 +408,15 @@ AI 负责怎么做。你负责做什么。
 ⭐ 如果觉得有用，给个 Star 吧！
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/LunaAI519?style=social)](https://twitter.com/LunaAI519)
+
+---
+
+## 📈 Star History
+
+<a href="https://star-history.com/#LunaAI519/video-to-brain&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=LunaAI519/video-to-brain&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=LunaAI519/video-to-brain&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=LunaAI519/video-to-brain&type=Date" />
+ </picture>
+</a>

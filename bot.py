@@ -14,25 +14,12 @@ import asyncio
 import logging
 import os
 import sys
+import time
+from collections import defaultdict
 from pathlib import Path
 
-# Load .env file
-def load_env(env_path=".env"):
-    """Load environment variables from .env file."""
-    if not os.path.exists(env_path):
-        env_path = os.path.expanduser("~/.hermes/.env")
-    if os.path.exists(env_path):
-        with open(env_path) as f:
-            for line in f:
-                line = line.strip()
-                if line.startswith("#") or "=" not in line:
-                    continue
-                key, _, val = line.partition("=")
-                key = key.strip()
-                val = val.strip().strip("'\"")
-                if key not in os.environ:
-                    os.environ[key] = val
-
+# Load .env file (before any other imports that read env vars)
+from src.env_loader import load_env
 load_env()
 
 # Now import after env is loaded
@@ -58,6 +45,44 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 OBSIDIAN_VAULT = os.environ.get("OBSIDIAN_VAULT", os.path.expanduser("~/Documents/notes"))
 MAX_BOT_API_SIZE = 20 * 1024 * 1024  # 20MB
 
+# --- Access Control ---
+# Set ALLOWED_USERS in .env to restrict who can use the bot.
+# Example: ALLOWED_USERS=123456789,987654321
+# Leave empty to allow everyone (not recommended in production).
+_allowed_raw = os.environ.get("ALLOWED_USERS", "").strip()
+ALLOWED_USERS: set[int] = set()
+if _allowed_raw:
+    for uid in _allowed_raw.split(","):
+        uid = uid.strip()
+        if uid.isdigit():
+            ALLOWED_USERS.add(int(uid))
+
+# --- Rate Limiting ---
+# Max videos per user per minute
+RATE_LIMIT = int(os.environ.get("RATE_LIMIT", "5"))
+_rate_tracker: dict[int, list[float]] = defaultdict(list)
+
+
+def _check_rate_limit(user_id: int) -> bool:
+    """Return True if user is within rate limit, False if exceeded."""
+    now = time.time()
+    window = 60  # 1 minute window
+    timestamps = _rate_tracker[user_id]
+    # Purge old entries
+    _rate_tracker[user_id] = [t for t in timestamps if now - t < window]
+    if len(_rate_tracker[user_id]) >= RATE_LIMIT:
+        return False
+    _rate_tracker[user_id].append(now)
+    return True
+
+
+def _is_authorized(user_id: int) -> bool:
+    """Check if user is authorized to use the bot."""
+    if not ALLOWED_USERS:
+        return True  # No whitelist = allow everyone
+    return user_id in ALLOWED_USERS
+
+
 # User preferences (per chat_id)
 user_prefs = {}  # {chat_id: {"template": "auto", "queue": []}}
 
@@ -71,6 +96,10 @@ def get_prefs(chat_id: int) -> dict:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /start command."""
+    if not _is_authorized(update.effective_user.id):
+        await update.message.reply_text("⛔ 你没有使用权限。请联系管理员。")
+        return
+
     deps = check_dependencies()
     large_dl = large_dl_available()
     ai_ready = bool(LLM_API_KEY)
@@ -98,34 +127,46 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /help command."""
+    if not _is_authorized(update.effective_user.id):
+        await update.message.reply_text("⛔ 你没有使用权限。")
+        return
+
     templates = get_template_names()
     template_list = "\n".join(f"  {v}" for v in templates.values())
 
-    help_text = f"""📖 使用说明
+    help_text = f"""📖 video-to-brain 使用说明
 
-🎬 发视频: 直接发视频给我，自动处理
-🗣️ 发语音: 发语音消息，同样处理
-↩️ 转发视频: 从其他聊天转发视频过来也行
+🎬 基本操作:
+  • 发视频 → 自动处理
+  • 发语音 → 同样处理
+  • 转发视频 → 从其他聊天转发过来也行
 
 📋 笔记模板:
 {template_list}
 
-🔧 命令:
-  /template — 选择笔记模板
+🔧 所有命令:
+  /start — 启动机器人，查看系统状态
+  /help — 显示本帮助信息
+  /template — 选择笔记模板（按钮选择）
   /vault <路径> — 修改笔记保存位置
   /status — 查看当前设置
-  /help — 显示本帮助
 
 💡 小技巧:
-- 发视频时带上文字说明，会作为笔记标题
-- 连续发多个视频，自动批量处理
-- 转发别人的视频也可以处理"""
+  • 发视频时带上文字说明，会作为笔记标题
+  • 连续发多个视频，自动批量处理
+  • 转发别人的视频也可以处理
+  • 超过 20MB 的视频也能处理（需配置）
+
+🔗 项目主页: github.com/LunaAI519/video-to-brain"""
 
     await update.message.reply_text(help_text)
 
 
 async def template_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /template command — show template selection buttons."""
+    if not _is_authorized(update.effective_user.id):
+        return
+
     templates = get_template_names()
     prefs = get_prefs(update.effective_chat.id)
     current = prefs["template"]
@@ -144,6 +185,9 @@ async def template_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
 
+    if not _is_authorized(update.effective_user.id):
+        return
+
     template_key = query.data.replace("tpl_", "")
     templates = get_template_names()
 
@@ -155,23 +199,33 @@ async def template_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def status_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /status command."""
+    if not _is_authorized(update.effective_user.id):
+        return
+
     prefs = get_prefs(update.effective_chat.id)
     templates = get_template_names()
     current_template = templates.get(prefs["template"], "未知")
     ai_ready = bool(LLM_API_KEY)
+
+    acl_status = f"✅ 白名单 ({len(ALLOWED_USERS)} 人)" if ALLOWED_USERS else "⚠️ 未设置（所有人可用）"
 
     text = f"""⚙️ 当前设置
 
 📋 笔记模板: {current_template}
 📁 保存路径: {OBSIDIAN_VAULT}
 🤖 AI分析: {'✅ 开启' if ai_ready else '❌ 关闭'}
-📹 大视频: {'✅ 支持' if large_dl_available() else '❌ 不支持'}"""
+📹 大视频: {'✅ 支持' if large_dl_available() else '❌ 不支持'}
+🔒 访问控制: {acl_status}
+⏱️ 频率限制: {RATE_LIMIT} 次/分钟"""
 
     await update.message.reply_text(text)
 
 
 async def set_vault(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle /vault command to change Obsidian vault path."""
+    if not _is_authorized(update.effective_user.id):
+        return
+
     global OBSIDIAN_VAULT
     if context.args:
         new_path = " ".join(context.args)
@@ -185,6 +239,18 @@ async def set_vault(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle incoming video messages (including forwarded videos)."""
     msg = update.message
+    user_id = update.effective_user.id
+
+    # Access control
+    if not _is_authorized(user_id):
+        await msg.reply_text("⛔ 你没有使用权限。请联系管理员。")
+        return
+
+    # Rate limiting
+    if not _check_rate_limit(user_id):
+        await msg.reply_text(f"⏳ 请求太频繁，请稍等一会再试。（限制：{RATE_LIMIT} 次/分钟）")
+        return
+
     video = msg.video or msg.document
 
     if not video:
@@ -354,6 +420,11 @@ def main():
     print(f"📁 笔记保存到: {OBSIDIAN_VAULT}")
     print(f"📹 大视频支持: {'✅ 已启用' if large_dl_available() else '❌ 未配置'}")
     print(f"🤖 AI智能笔记: {'✅ 已启用' if ai_ready else '⚠️ 未配置（仅基础转录）'}")
+    if ALLOWED_USERS:
+        print(f"🔒 访问控制: ✅ 白名单 ({len(ALLOWED_USERS)} 人)")
+    else:
+        print("🔒 访问控制: ⚠️ 未设置（所有人可用）")
+    print(f"⏱️ 频率限制: {RATE_LIMIT} 次/分钟")
     print()
 
     # Create Obsidian vault dir if needed

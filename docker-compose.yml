@@ -1,0 +1,13 @@
+services:
+  bot:
+    build: .
+    container_name: video-to-brain
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      # Mount your Obsidian vault (change left side to your vault path)
+      - ./vault:/data/vault
+      # Persistent cache for Pyrogram sessions and downloaded videos
+      - ./cache:/data/cache
+    environment:
+      - OBSIDIAN_VAULT=/data/vault
