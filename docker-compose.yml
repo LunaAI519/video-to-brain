@@ -11,3 +11,9 @@ services:
       - ./cache:/data/cache
     environment:
       - OBSIDIAN_VAULT=/data/vault
+    # Whisper models are memory-heavy; adjust based on your model size:
+    #   tiny/base: 1g | small: 2g | medium: 4g | turbo/large: 6g
+    deploy:
+      resources:
+        limits:
+          memory: 4g

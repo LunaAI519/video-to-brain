@@ -26,9 +26,9 @@ Not just transcription — real notes with key takeaways, quotes, action items, 
 ```
 
 <p align="center">
-  <img src="docs/demo/demo.svg" alt="video-to-brain demo" width="400">
+  <img src="docs/demo/telegram-screenshot.png" alt="Telegram chat screenshot — send video, get AI notes" width="400">
   <br>
-  <em>Send video → 30s later get AI notes → auto-saved to Obsidian</em>
+  <em>Real demo: send a 135MB video → 3 min later get AI-powered notes, auto-saved to Obsidian</em>
 </p>
 
 **📸 See what the notes look like:** [Study note example](docs/demo/sample-note-study.md) · [Content note example](docs/demo/sample-note-content.md)

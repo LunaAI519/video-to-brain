@@ -78,3 +78,7 @@ All notable changes to this project will be documented in this file.
 - Break Telegram 20MB limit via Pyrogram MTProto (up to 2GB)
 - Basic Obsidian note generation
 - ffmpeg audio extraction
+
+[0.3.0]: https://github.com/LunaAI519/video-to-brain/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/LunaAI519/video-to-brain/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/LunaAI519/video-to-brain/releases/tag/v0.1.0

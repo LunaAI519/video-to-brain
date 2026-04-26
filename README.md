@@ -26,9 +26,9 @@
 ```
 
 <p align="center">
-  <img src="docs/demo/demo.svg" alt="video-to-brain demo" width="400">
+  <img src="docs/demo/telegram-screenshot.png" alt="Telegram 聊天截图 — 发视频收笔记" width="400">
   <br>
-  <em>手机发视频 → 30秒后收到 AI 笔记 → 自动存入 Obsidian</em>
+  <em>真实效果：发 135MB 视频 → 3分钟后收到 AI 笔记，自动存入 Obsidian</em>
 </p>
 
 **📸 看看生成的笔记长什么样：** [学习笔记示例](docs/demo/sample-note-study.md) · [内容素材示例](docs/demo/sample-note-content.md)
