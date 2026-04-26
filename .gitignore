@@ -1,0 +1,23 @@
+# Environment
+.env
+*.session
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Cache
+cache/
+*.wav
+*.mp3
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
