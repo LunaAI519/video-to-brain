@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 520" fill="none">
+  <style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes typing { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+    .msg1 { animation: fadeIn 0.5s ease 0.5s both; }
+    .msg2 { animation: fadeIn 0.5s ease 1.5s both; }
+    .msg3 { animation: fadeIn 0.5s ease 2.5s both; }
+    .msg4 { animation: fadeIn 0.5s ease 3.5s both; }
+    .msg5 { animation: fadeIn 0.5s ease 4.5s both; }
+    .dot1 { animation: typing 1s ease infinite 2s; }
+    .dot2 { animation: typing 1s ease infinite 2.2s; }
+    .dot3 { animation: typing 1s ease infinite 2.4s; }
+    text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  </style>
+  
+  <!-- Background -->
+  <rect width="400" height="520" rx="12" fill="#0E1621"/>
+  
+  <!-- Header -->
+  <rect width="400" height="52" rx="12" fill="#17212B"/>
+  <rect y="40" width="400" height="12" fill="#17212B"/>
+  <circle cx="30" cy="26" r="16" fill="#2B5278"/>
+  <text x="30" y="30" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">🤖</text>
+  <text x="54" y="23" fill="#fff" font-size="14" font-weight="600">video-to-brain</text>
+  <text x="54" y="38" fill="#6C7883" font-size="11">online</text>
+  
+  <!-- User sends video (right aligned, green bubble) -->
+  <g class="msg1">
+    <rect x="140" y="70" width="245" height="80" rx="12" fill="#2B5278"/>
+    <text x="155" y="92" fill="#fff" font-size="12">🎬 AI_Interview_30min.mp4</text>
+    <text x="155" y="110" fill="#8AAFCE" font-size="11">📁 145.2 MB · 30:15</text>
+    <rect x="155" y="120" width="100" height="3" rx="1.5" fill="#3A6A9B"/>
+    <rect x="155" y="120" width="100" height="3" rx="1.5" fill="#5EB5F7"/>
+    <text x="355" y="142" text-anchor="end" fill="#6C7883" font-size="10">17:32 ✓✓</text>
+  </g>
+  
+  <!-- Bot processing (left aligned, dark bubble) -->
+  <g class="msg2">
+    <rect x="15" y="165" width="250" height="45" rx="12" fill="#182533"/>
+    <text x="30" y="185" fill="#fff" font-size="12">🎙️ 转录中... Whisper turbo</text>
+    <text x="30" y="202" fill="#6C7883" font-size="11">突破20MB限制 ✅ MTProto下载完成</text>
+  </g>
+  
+  <!-- Bot analyzing -->
+  <g class="msg3">
+    <rect x="15" y="225" width="220" height="30" rx="12" fill="#182533"/>
+    <text x="30" y="245" fill="#fff" font-size="12">🧠 AI 分析中... 学习模式</text>
+  </g>
+  
+  <!-- Bot result -->
+  <g class="msg4">
+    <rect x="15" y="270" width="330" height="190" rx="12" fill="#182533"/>
+    <text x="30" y="292" fill="#5EB5F7" font-size="13" font-weight="600">📝 笔记已生成</text>
+    
+    <text x="30" y="315" fill="#fff" font-size="11" font-weight="600">🔑 核心要点</text>
+    <text x="30" y="332" fill="#D4DEE8" font-size="11">1. RAG 三步法：索引→检索→生成</text>
+    <text x="30" y="349" fill="#D4DEE8" font-size="11">2. 向量数据库：Pinecone 生产首选</text>
+    <text x="30" y="366" fill="#D4DEE8" font-size="11">3. Fine-tuning vs RAG 选型决策树</text>
+    
+    <text x="30" y="389" fill="#fff" font-size="11" font-weight="600">💬 金句</text>
+    <text x="30" y="406" fill="#8AAFCE" font-size="11" font-style="italic">"Don't fine-tune when you can retrieve"</text>
+    
+    <text x="30" y="429" fill="#fff" font-size="11" font-weight="600">✅ 行动项</text>
+    <text x="30" y="446" fill="#D4DEE8" font-size="11">☐ 搭建 RAG 原型用 Chroma</text>
+    
+    <text x="315" y="455" text-anchor="end" fill="#6C7883" font-size="10">17:33</text>
+  </g>
+  
+  <!-- Saved to Obsidian -->
+  <g class="msg5">
+    <rect x="15" y="475" width="310" height="30" rx="12" fill="#182533"/>
+    <text x="30" y="495" fill="#5EB5F7" font-size="12">💾 已保存 → ~/vault/知识库/RAG实战指南.md</text>
+  </g>
+</svg>

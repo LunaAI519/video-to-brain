@@ -1,11 +1,14 @@
 # 📹 video-to-brain
 
+> **🌐 [English](README_EN.md)** | **中文**
+
 [![Tests](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml/badge.svg)](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/LunaAI519/video-to-brain/branch/main/graph/badge.svg)](https://codecov.io/gh/LunaAI519/video-to-brain)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![GitHub release](https://img.shields.io/github/v/release/LunaAI519/video-to-brain)](https://github.com/LunaAI519/video-to-brain/releases)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker&logoColor=white)](https://github.com/LunaAI519/video-to-brain#-docker-一键部署推荐)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/template/video-to-brain?referralCode=LunaAI519)
 [![Twitter Follow](https://img.shields.io/twitter/follow/LunaAI519?style=social)](https://twitter.com/LunaAI519)
 
 **手机发视频，AI 帮你做笔记。**
@@ -22,9 +25,8 @@
 └──────────┘    └──────────────┘    └─────────┘    └──────────┘    └──────────┘
 ```
 
-<!-- 🎬 GIF Demo — replace with your own screen recording -->
 <p align="center">
-  <img src="docs/demo/demo.gif" alt="video-to-brain demo" width="600">
+  <img src="docs/demo/demo.svg" alt="video-to-brain demo" width="400">
   <br>
   <em>手机发视频 → 30秒后收到 AI 笔记 → 自动存入 Obsidian</em>
 </p>
