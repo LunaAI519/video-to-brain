@@ -1,6 +1,6 @@
 # 📹 video-to-brain
 
-[![Tests](https://img.shields.io/badge/tests-43%20passed-brightgreen)](https://github.com/LunaAI519/video-to-brain/tree/main/tests)
+[![Tests](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml/badge.svg)](https://github.com/LunaAI519/video-to-brain/actions/workflows/test.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![GitHub release](https://img.shields.io/github/v/release/LunaAI519/video-to-brain)](https://github.com/LunaAI519/video-to-brain/releases)
